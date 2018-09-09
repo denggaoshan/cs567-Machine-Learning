@@ -21,7 +21,10 @@ def linear_regression_noreg(X, y):
   """
   #####################################################
   #				 YOUR CODE HERE					                    #
-  #####################################################		 
+  #####################################################		
+  XT = X.transpose()
+  XTX = np.matmul(XT, X)
+  w = np.matmul(np.matmul(np.linalg.inv(XTX), XT), y)
   return w
 
 ###### Q4.2 ######
@@ -37,7 +40,11 @@ def regularized_linear_regression(X, y, lambd):
     """
   #####################################################
   #				 YOUR CODE HERE					                    #
-  #####################################################		 
+  #####################################################		
+  XT = X.transpose()
+  XTX = np.matmul(XT, X)
+  lambdaT = np.eye(XT.shape[0]) * lambd
+  w = np.matmul(np.matmul(np.linalg.inv(XTX + lambdaT), XT), y) 
   return w
 
 ###### Q4.3 ######
@@ -55,7 +62,15 @@ def tune_lambda(Xtrain, ytrain, Xval, yval, lambds):
     """
   #####################################################
   #				 YOUR CODE HERE					                    #
-  #####################################################		 
+  #####################################################
+  bestlambda = lambds[0]
+  besterr = 100000
+  for lambd in lambds:
+    w = regularized_linear_regression(Xtrain, ytrain, lambd)
+    err = test_error(w, Xval, yval)
+    if err < besterr:
+      bestlambda = lambd
+      besterr = err
   return bestlambda
 
 ###### Q4.4 ######
@@ -69,6 +84,8 @@ def test_error(w, X, y):
     Returns:
     - err: the mean square error
     """
+  tmp = np.matmul(X, w) - y  
+  err = (np.matmul(tmp.transpose(), tmp)) / y.shape[0]
   return err
 
 

@@ -25,10 +25,11 @@ def compute_distances(Xtrain, X):
 	#####################################################
 	#				 YOUR CODE HERE					                    #
 	#####################################################
-	dists = np.zeros((Xtrain.shape[0], X.shape[0]))
-	for i in range(Xtrain.shape[0]):
-		for j in range(X.shape[0]):
-			dists[i,j] = np.sum( (Xtrain[i,:]-X[j,:])**2 )
+	dists = np.zeros((X.shape[0], Xtrain.shape[0]))
+
+	for i in range(X.shape[0]):
+		for j in range(Xtrain.shape[0]):
+			dists[i,j] = np.sqrt(np.sum( (X[i,:]-Xtrain[j,:])**2 ))
 	return dists
 
 ###### Q5.2 ######
@@ -52,15 +53,16 @@ def predict_labels(k, ytrain, dists):
 	ypred = np.zeros(dists.shape[0])
 	
 	sortedDists = np.argsort(dists)
-
-	for i in range(ypred.shape[0]):
+	for i in range(sortedDists.shape[0]):
 		classCount = {}
-		for j in range(sortedDists[i].shape[0]):
-			if sortedDists[i][j] < k:
-				classCount[ytrain[j]] = classCount.get(ytrain[j], 0) + 1
-		#Find Max times class
-		ypred[i] = max(classCount.items(), key=lambda x: x[1])[0]
+		for j in range(k):
+			if ytrain[ sortedDists[i][j]] in classCount:
+				classCount[ytrain[ sortedDists[i][j]]] += 1
+			else:
+				classCount[ytrain[ sortedDists[i][j]]] = 1
 
+		ypred[i] = max(classCount.items(), key=lambda x: x[1])[0]
+		
 	return ypred
 
 
@@ -81,10 +83,12 @@ def compute_accuracy(y, ypred):
 	#####################################################
 	total = y.shape[0]
 	correct = 0
+	
 	for i in range(total):
 		if y[i] == ypred[i]:
 			correct += 1
 	acc = correct / total
+	
 	return acc
 
 ###### Q5.4 ######
@@ -122,7 +126,6 @@ def find_best_k(K, ytrain, dists, yval):
 			best_k = k
 	return best_k, validation_accuracy
 
-
 """
 NO MODIFICATIONS below this line.
 You should only write your code in the above functions.
@@ -158,7 +161,7 @@ def main():
 	K=[1, 3, 5, 7, 9]	
 	
 	Xtrain, ytrain, Xval, yval, Xtest, ytest = data_processing(data)
-
+	
 	dists = compute_distances(Xtrain, Xval)
 	
 	#===============Compute validation accuracy when k=5=============
