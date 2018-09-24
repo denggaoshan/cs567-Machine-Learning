@@ -61,7 +61,9 @@ def predict_labels(k, ytrain, dists):
 			else:
 				classCount[ytrain[ sortedDists[i][j]]] = 1
 
-		ypred[i] = max(classCount.items(), key=lambda x: x[1])[0]
+		#Max value 
+		max_times = max([y for (x,y) in classCount.items()])
+		ypred[i] = min([ x for (x,y) in classCount.items() if y == max_times])
 		
 	return ypred
 
